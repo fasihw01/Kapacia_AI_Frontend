@@ -17,7 +17,7 @@ function LoginPage() {
       const userData = await login(email, password);
 
       // Route based on user role
-      if (userData?.role === "admin") {
+      if (userData?.role === "admin" || userData?.role === "organisation") {
         navigate("/admin/dashboard");
       } else if (userData?.role === "practitioner") {
         navigate("/practitioner/dashboard");

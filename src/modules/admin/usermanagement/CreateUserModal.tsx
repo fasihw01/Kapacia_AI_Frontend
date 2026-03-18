@@ -138,6 +138,7 @@ export const CreateUserModal = ({
             >
               <option value="practitioner">Practitioner</option>
               <option value="admin">Admin</option>
+              <option value="organisation">Organisation</option>
             </select>
           </div>
 

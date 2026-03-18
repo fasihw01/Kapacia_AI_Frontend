@@ -13,12 +13,12 @@ export function AuthLayout() {
   }
   if (isAuthenticated && user) {
     const redirectPath =
-      user.role === "admin" 
-        ? "/admin/dashboard" 
+      user.role === "admin" || user.role === "organisation"
+        ? "/admin/dashboard"
         : user.role === "practitioner"
-        ? "/practitioner/dashboard"
-        : "/";
-    
+          ? "/practitioner/dashboard"
+          : "/";
+
     return <Navigate to={redirectPath} replace />;
   }
   return (

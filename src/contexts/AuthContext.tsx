@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { loginUser, fetchCurrentUser } from "@/services/authService";
+import {
+  loginUser,
+  fetchCurrentUser,
+  registerUser,
+} from "@/services/authService";
 import { AuthContext } from "./auth/AuthContext";
 import type { UserData, AuthContextType } from "./auth/AuthContext";
 import { toast } from "react-toastify";
@@ -104,6 +108,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Register function (organisation role)
+  const register = async (
+    organisationName: string,
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<UserData | null> => {
+    try {
+      setIsLoading(true);
+      const userData = await registerUser({
+        organisationName,
+        name,
+        email,
+        password,
+        role: "organisation",
+      });
+      console.log("userData from registerUser", userData);
+      setToken(userData.token);
+      updateUser(userData);
+      return userData;
+    } catch (error) {
+      console.error("Registration failed:", error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Registration failed. Please try again.";
+      toast.error(message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Logout function
   const logout = () => {
     removeToken();
@@ -144,6 +181,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     isLoading,
     isAuthenticated: !!user,
     login,
+    register,
     logout,
     refreshUser,
   };

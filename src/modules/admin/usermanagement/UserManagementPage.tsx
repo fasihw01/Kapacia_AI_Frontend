@@ -98,6 +98,7 @@ export const UserManagementPage = () => {
           >
             <option value="">All Roles</option>
             <option value="admin">Admin</option>
+            <option value="organisation">Organisation</option>
             <option value="practitioner">Practitioner</option>
           </select>
           <ChevronDown className="top-1/2 right-3 absolute w-4 h-4 text-gray-400 -translate-y-1/2 pointer-events-none" />
