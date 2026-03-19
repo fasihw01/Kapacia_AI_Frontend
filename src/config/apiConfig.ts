@@ -6,7 +6,7 @@ export const API_BASE_URL =
 export const API_ENDPOINTS = {
   // Auth endpoints
   LOGIN: "/user/login",
-  SIGNUP: "/organisation/register",
+  ORGANISATION_SIGNUP: "/organisation/register",
   GET_USER: "/user/",
 
   // Other endpoints can be added here

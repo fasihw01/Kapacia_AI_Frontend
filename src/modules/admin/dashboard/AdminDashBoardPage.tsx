@@ -5,12 +5,13 @@ import { FileText, Calendar, Clock, ChevronRight, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAllCases } from "@/hooks/useCases";
 import { useAllSessions } from "@/hooks/useSessions";
-import { useAllUsers } from "@/hooks/useUsers";
+import { useAllUsers, usePractitioners } from "@/hooks/useUsers";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminDashBoardPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isOrganisation = user?.role === "organisation";
 
   // Dashboard data
   const {
@@ -33,6 +34,8 @@ const AdminDashBoardPage = () => {
     isLoading: usersLoading,
     isError: usersError,
   } = useAllUsers({ limit: 100 });
+  const { data: practitionersData, isLoading: practitionersLoading } =
+    usePractitioners({ limit: 100 });
 
   const cases = allCasesData?.cases || [];
   const caseStats = allCasesData?.stats || {};
@@ -44,21 +47,40 @@ const AdminDashBoardPage = () => {
   // Get the first 5 cases for recent cases display
   const recentCases = cases.slice(0, 5);
 
-  // User stats
+  // User stats (admin)
   const allUsers = usersData?.users || [];
   const totalUsers = allUsers.length;
+  const totalOrganisations = allUsers.filter(
+    (u: any) => u.role === "organisation",
+  ).length;
   const adminCount = allUsers.filter((u: any) => u.role === "admin").length;
   const practitionerCount = allUsers.filter(
     (u: any) => u.role === "practitioner",
   ).length;
-  // const supervisionCount = allUsers.filter(
-  //   (u: any) => u.role === "supervision",
-  // ).length;
 
-  const stats = [
+  // Organisation-scoped practitioner count
+  const myPractitionerCount =
+    practitionersData?.pagination?.total ??
+    (practitionersData?.users || practitionersData?.practitioners || []).length;
+
+  const adminStats = [
     {
       label: "Total Users",
       value: totalUsers,
+      icon: Users,
+      bgColor: "bg-primary/5",
+      iconColor: "text-primary",
+    },
+    {
+      label: "Total Organisations",
+      value: totalOrganisations,
+      icon: Users,
+      bgColor: "bg-primary/5",
+      iconColor: "text-primary",
+    },
+    {
+      label: "Total Practitioners",
+      value: practitionerCount,
       icon: Users,
       bgColor: "bg-primary/5",
       iconColor: "text-primary",
@@ -78,6 +100,32 @@ const AdminDashBoardPage = () => {
       iconColor: "text-primary",
     },
   ];
+
+  const organisationStats = [
+    {
+      label: "Total Practitioners",
+      value: myPractitionerCount,
+      icon: Users,
+      bgColor: "bg-primary/5",
+      iconColor: "text-primary",
+    },
+    {
+      label: "Active Cases",
+      value: caseStats.active ?? 0,
+      icon: Calendar,
+      bgColor: "bg-primary/5",
+      iconColor: "text-primary",
+    },
+    {
+      label: "Total Sessions",
+      value: totalSessions,
+      icon: Clock,
+      bgColor: "bg-primary/5",
+      iconColor: "text-primary",
+    },
+  ];
+
+  const stats = isOrganisation ? organisationStats : adminStats;
 
   const showSkeleton = casesLoading && allSessionsLoading;
 
@@ -168,77 +216,128 @@ const AdminDashBoardPage = () => {
             </div>
           </div>
 
-          <div>
-            <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 mb-4">
-              <div className="flex items-center gap-2">
+          {isOrganisation ? (
+            /* Practitioners panel for organisation role */
+            <div>
+              <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 mb-4">
                 <h2 className="font-normal text-secondary text-lg sm:text-2xl">
-                  User Management
+                  Practitioners
                 </h2>
               </div>
-            </div>
 
-            <div className="bg-primary/5 p-6 rounded-2xl">
-              {usersLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="w-1/3 h-6" />
-                  <Skeleton className="w-2/3 h-4" />
-                  <Skeleton className="w-1/2 h-4" />
-                </div>
-              ) : usersError ? (
-                <p className="text-red-600 text-sm">
-                  Unable to load user data.
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {/* User Stats */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-accent text-sm">Total User:</span>
-                      <span className="font-medium text-secondary">
-                        {totalUsers}
-                      </span>
+              <div className="bg-primary/5 p-6 rounded-2xl">
+                {practitionersLoading ? (
+                  <div className="space-y-3">
+                    <Skeleton className="w-1/3 h-6" />
+                    <Skeleton className="w-1/2 h-4" />
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent text-sm">
+                          Total Practitioners:
+                        </span>
+                        <span className="font-medium text-secondary">
+                          {myPractitionerCount}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-accent text-sm">Admin:</span>
-                      <span className="font-medium text-secondary">
-                        {adminCount}
-                      </span>
-                    </div>
-                    {/* <div className="flex justify-between items-center">
-                      <span className="text-accent text-sm">Supervision:</span>
-                      <span className="font-medium text-secondary">
-                        {supervisionCount}
-                      </span>
-                    </div> */}
-                    <div className="flex justify-between items-center">
-                      <span className="text-accent text-sm">
-                        Practitioners:
-                      </span>
-                      <span className="font-medium text-secondary">
-                        {practitionerCount}
-                      </span>
+
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        onClick={() => navigate("/admin/practitioners")}
+                        className="flex-1 bg-primary hover:bg-primary/80 text-white text-sm cursor-pointer"
+                      >
+                        Add Practitioner
+                      </Button>
+                      <Button
+                        onClick={() => navigate("/admin/practitioners")}
+                        className="flex-1 bg-primary/10 hover:bg-primary/20 text-primary text-sm cursor-pointer"
+                      >
+                        Manage Practitioners
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      onClick={() => navigate("/admin/user-management")}
-                      className="flex-1 bg-primary hover:bg-primary/80 text-white text-sm cursor-pointer"
-                    >
-                      Add User
-                    </Button>
-                    <Button
-                      onClick={() => navigate("/admin/user-management")}
-                      className="flex-1 bg-primary/10 hover:bg-primary/20 text-primary text-sm cursor-pointer"
-                    >
-                      Manage Users
-                    </Button>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            /* User Management panel for admin role */
+            <div>
+              <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-normal text-secondary text-lg sm:text-2xl">
+                    User Management
+                  </h2>
+                </div>
+              </div>
+
+              <div className="bg-primary/5 p-6 rounded-2xl">
+                {usersLoading ? (
+                  <div className="space-y-3">
+                    <Skeleton className="w-1/3 h-6" />
+                    <Skeleton className="w-2/3 h-4" />
+                    <Skeleton className="w-1/2 h-4" />
+                  </div>
+                ) : usersError ? (
+                  <p className="text-red-600 text-sm">
+                    Unable to load user data.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent text-sm">
+                          Total Users:
+                        </span>
+                        <span className="font-medium text-secondary">
+                          {totalUsers}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent text-sm">Admin:</span>
+                        <span className="font-medium text-secondary">
+                          {adminCount}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent text-sm">
+                          Organisations:
+                        </span>
+                        <span className="font-medium text-secondary">
+                          {totalOrganisations}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent text-sm">
+                          Practitioners:
+                        </span>
+                        <span className="font-medium text-secondary">
+                          {practitionerCount}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        onClick={() => navigate("/admin/user-management")}
+                        className="flex-1 bg-primary hover:bg-primary/80 text-white text-sm cursor-pointer"
+                      >
+                        Add User
+                      </Button>
+                      <Button
+                        onClick={() => navigate("/admin/user-management")}
+                        className="flex-1 bg-primary/10 hover:bg-primary/20 text-primary text-sm cursor-pointer"
+                      >
+                        Manage Users
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div>
             <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 mb-4">

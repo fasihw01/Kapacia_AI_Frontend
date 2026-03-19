@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import {
   loginUser,
   fetchCurrentUser,
-  registerUser,
+  registerOrganisation,
 } from "@/services/authService";
 import { AuthContext } from "./auth/AuthContext";
 import type { UserData, AuthContextType } from "./auth/AuthContext";
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   ): Promise<UserData | null> => {
     try {
       setIsLoading(true);
-      const userData = await registerUser({
+      const userData = await registerOrganisation({
         organisationName,
         name,
         email,

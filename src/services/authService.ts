@@ -94,12 +94,12 @@ export const loginUser = async (
 };
 
 // Register a new organisation
-export const registerUser = async (
+export const registerOrganisation = async (
   payload: RegisterPayload,
 ): Promise<UserData> => {
   try {
     const response = await axios.post<SignupResponse>(
-      `${API_BASE_URL}${API_ENDPOINTS.SIGNUP}`,
+      `${API_BASE_URL}${API_ENDPOINTS.ORGANISATION_SIGNUP}`,
       payload,
       {
         headers: {

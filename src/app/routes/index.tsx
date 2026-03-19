@@ -33,6 +33,8 @@ import { AuditPage as PractitionerAuditPage } from "@/modules/practitioner/audit
 import { AdminCaseDetailPage } from "@/modules/admin/cases/AdminCaseDetailPage";
 import { AdminSessionViewPage } from "@/modules/admin/cases/AdminSessionViewPage";
 import { AdminSummaryDetailPage } from "@/modules/admin/cases/AdminSummaryDetailPage";
+import { OrganisationManagementPage } from "@/modules/admin/organisations/OrganisationManagementPage";
+import { PractitionersPage } from "@/modules/admin/practitioners/PractitionersPage";
 
 export function AppRoutes() {
   return (
@@ -77,6 +79,11 @@ export function AppRoutes() {
             element={<AdminSummaryDetailPage />}
           />
           <Route path="user-management" element={<UserManagementPage />} />
+          <Route path="practitioners" element={<PractitionersPage />} />
+          <Route
+            path="organisation-management"
+            element={<OrganisationManagementPage />}
+          />
           <Route
             path="supervision-management"
             element={<SupervisionManagementPage />}
