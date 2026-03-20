@@ -159,9 +159,6 @@ export const CreateUserModal = ({
             >
               {isAdmin && <option value="admin">Admin</option>}
               {isAdmin && <option value="moderator">Moderator</option>}
-              {user?.role === "admin" && (
-                <option value="organisation">Organisation</option>
-              )}
             </select>
           </div>
 
