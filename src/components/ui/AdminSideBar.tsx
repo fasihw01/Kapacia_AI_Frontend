@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/useAuth";
 
 const PractitionerSideBar = () => {
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "moderator";
   const isOrganisation = user?.role === "organisation";
 
   const items = [
@@ -20,7 +20,7 @@ const PractitionerSideBar = () => {
       label: "All Cases",
       to: "/admin/cases",
       icon: "class",
-      show: true,
+      show: isOrganisation,
     },
     {
       key: "user-management",
@@ -34,7 +34,7 @@ const PractitionerSideBar = () => {
       label: "Practitioners",
       to: "/admin/practitioners",
       icon: "user",
-      show: isOrganisation || isAdmin,
+      show: isOrganisation,
     },
     {
       key: "organisation-management",

@@ -17,7 +17,7 @@ function LoginPage() {
       const userData = await login(email, password);
 
       // Route based on user role
-      if (userData?.role === "admin" || userData?.role === "organisation") {
+      if (userData?.role === "admin" || userData?.role === "moderator" || userData?.role === "organisation") {
         navigate("/admin/dashboard");
       } else if (userData?.role === "practitioner") {
         navigate("/practitioner/dashboard");
@@ -113,18 +113,18 @@ function LoginPage() {
               )}
             </button>
 
-            {/* Sign Up Link */}
-            {/* <div className="text-center">
-              <p className="text-gray-400">
-                Don't have an account?{" "}
-                <Link
-                  to="/signup"
-                  className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Sign Up
-                </Link>
+            {/* Organisation Sign Up CTA */}
+            <div className="border border-white/10 rounded-lg p-4 text-center">
+              <p className="mb-2 text-gray-400 text-sm">
+                Want to register your organisation?
               </p>
-            </div> */}
+              <Link
+                to="/organisation-signup"
+                className="inline-block bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-lg w-full font-medium text-primary text-sm transition-colors"
+              >
+                Register as Organisation
+              </Link>
+            </div>
           </form>
         </div>
       </div>

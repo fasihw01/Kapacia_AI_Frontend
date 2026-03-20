@@ -53,9 +53,14 @@ const AdminDashBoardPage = () => {
   const totalOrganisations = allUsers.filter(
     (u: any) => u.role === "organisation",
   ).length;
-  const adminCount = allUsers.filter((u: any) => u.role === "admin").length;
+  const adminCount = allUsers.filter(
+    (u: any) => u.role === "admin" || u.role === "moderator",
+  ).length;
   const practitionerCount = allUsers.filter(
     (u: any) => u.role === "practitioner",
+  ).length;
+  const moderatorCount = allUsers.filter(
+    (u: any) => u.role === "moderator",
   ).length;
 
   // Organisation-scoped practitioner count
@@ -302,6 +307,12 @@ const AdminDashBoardPage = () => {
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
+                        <span className="text-accent text-sm">Moderator:</span>
+                        <span className="font-medium text-secondary">
+                          {moderatorCount}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
                         <span className="text-accent text-sm">
                           Organisations:
                         </span>
@@ -339,85 +350,79 @@ const AdminDashBoardPage = () => {
             </div>
           )}
 
-          <div>
-            <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 mb-4">
-              <div className="flex items-center gap-2">
-                <h2 className="font-normal text-secondary text-lg sm:text-2xl">
-                  Recent Cases
-                </h2>
-                {/* <span className="flex justify-center items-center bg-primary/10 rounded-full w-6 h-6 font-normal text-primary text-sm">
-                  {cases.length}
-                </span> */}
+          {/* Recent Cases — organisation role only */}
+          {isOrganisation && (
+            <div>
+              <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-normal text-secondary text-lg sm:text-2xl">
+                    Recent Cases
+                  </h2>
+                </div>
+                <Link
+                  to="/admin/cases"
+                  className="flex items-center gap-1 font-normal text-primary text-sm hover:underline cursor-pointer"
+                >
+                  View all cases
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
               </div>
-              <Link
-                to="/admin/cases"
-                className="flex items-center gap-1 font-normal text-primary text-sm hover:underline cursor-pointer"
-              >
-                View all cases
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
 
-            <div className="space-y-3 bg-primary/5 p-4 rounded-2xl">
-              {(casesLoading || casesError) && (
-                <Card className="p-4 sm:p-5">
-                  {casesLoading ? (
-                    <div className="space-y-3">
-                      <Skeleton className="w-1/3 h-6" />
-                      <Skeleton className="w-2/3 h-4" />
-                      <Skeleton className="w-1/2 h-4" />
-                    </div>
-                  ) : (
-                    <p className="text-red-600 text-sm">
-                      Unable to load cases.
-                    </p>
-                  )}
-                </Card>
-              )}
-
-              {!casesLoading && !casesError && cases.length === 0 && (
-                <Card className="p-4 sm:p-5">
-                  <p className="text-accent">No recent cases</p>
-                </Card>
-              )}
-
-              {!casesLoading &&
-                !casesError &&
-                recentCases.map((caseItem: any) => (
-                  <Card key={caseItem._id} className="p-4 sm:p-5">
-                    <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-4">
-                      <div className="flex-1 space-y-1">
-                        <div className="flex sm:flex-row flex-col sm:items-center gap-2">
-                          {/* <h3 className="text-secondary text-base">
-                            {caseItem.internalRef}
-                          </h3>
-                          <span className="hidden sm:inline text-gray-400 text-sm">
-                            -
-                          </span> */}
-                          <span className="text-accent text-sm">
-                            {caseItem.displayName}
-                          </span>
-                        </div>
-                        <div className="flex sm:flex-row flex-col gap-1 sm:gap-2 text-accent text-sm">
-                          <span>Status: {caseItem.status}</span>
-                          <span className="hidden sm:inline text-primary/80">
-                            •
-                          </span>
-                          <span>Sessions: {caseItem.sessionsCount ?? 0}</span>
-                        </div>
+              <div className="space-y-3 bg-primary/5 p-4 rounded-2xl">
+                {(casesLoading || casesError) && (
+                  <Card className="p-4 sm:p-5">
+                    {casesLoading ? (
+                      <div className="space-y-3">
+                        <Skeleton className="w-1/3 h-6" />
+                        <Skeleton className="w-2/3 h-4" />
+                        <Skeleton className="w-1/2 h-4" />
                       </div>
-                      <Button
-                        onClick={() => navigate(`/admin/cases/${caseItem._id}`)}
-                        className="bg-primary hover:bg-primary/80 w-full sm:w-auto text-white text-sm cursor-pointer"
-                      >
-                        View Details
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    ) : (
+                      <p className="text-red-600 text-sm">
+                        Unable to load cases.
+                      </p>
+                    )}
                   </Card>
-                ))}
+                )}
+
+                {!casesLoading && !casesError && cases.length === 0 && (
+                  <Card className="p-4 sm:p-5">
+                    <p className="text-accent">No recent cases</p>
+                  </Card>
+                )}
+
+                {!casesLoading &&
+                  !casesError &&
+                  recentCases.map((caseItem: any) => (
+                    <Card key={caseItem._id} className="p-4 sm:p-5">
+                      <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-4">
+                        <div className="flex-1 space-y-1">
+                          <div className="flex sm:flex-row flex-col sm:items-center gap-2">
+                            <span className="text-accent text-sm">
+                              {caseItem.displayName}
+                            </span>
+                          </div>
+                          <div className="flex sm:flex-row flex-col gap-1 sm:gap-2 text-accent text-sm">
+                            <span>Status: {caseItem.status}</span>
+                            <span className="hidden sm:inline text-primary/80">
+                              •
+                            </span>
+                            <span>Sessions: {caseItem.sessionsCount ?? 0}</span>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => navigate(`/admin/cases/${caseItem._id}`)}
+                          className="bg-primary hover:bg-primary/80 w-full sm:w-auto text-white text-sm cursor-pointer"
+                        >
+                          View Details
+                          <ChevronRight className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Recent Sessions */}
           {/* <div>

@@ -98,6 +98,7 @@ export const UserManagementPage = () => {
           >
             <option value="">All Roles</option>
             <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
             <option value="organisation">Organisation</option>
             <option value="practitioner">Practitioner</option>
           </select>
@@ -167,7 +168,9 @@ export const UserManagementPage = () => {
                           className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                             user.role === "admin"
                               ? "bg-purple-100 text-purple-700"
-                              : "bg-blue-100 text-blue-700"
+                              : user.role === "moderator"
+                                ? "bg-indigo-100 text-indigo-700"
+                                : "bg-blue-100 text-blue-700"
                           }`}
                         >
                           {user.role}

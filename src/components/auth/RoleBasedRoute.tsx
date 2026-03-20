@@ -75,6 +75,7 @@ const RoleBasedRoute: React.FC<RoleBasedRouteProps> = ({
 const getRoleBasedRedirect = (role: string): string => {
   switch (role) {
     case "admin":
+    case "moderator":
     case "organisation":
       return "/admin/dashboard";
     case "practitioner":

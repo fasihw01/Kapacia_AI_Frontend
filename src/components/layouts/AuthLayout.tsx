@@ -13,7 +13,7 @@ export function AuthLayout() {
   }
   if (isAuthenticated && user) {
     const redirectPath =
-      user.role === "admin" || user.role === "organisation"
+      user.role === "admin" || user.role === "moderator" || user.role === "organisation"
         ? "/admin/dashboard"
         : user.role === "practitioner"
           ? "/practitioner/dashboard"

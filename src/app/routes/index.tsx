@@ -60,7 +60,7 @@ export function AppRoutes() {
         <Route
           path="/admin"
           element={
-            <RoleBasedRoute allowedRoles={["admin", "organisation"]}>
+            <RoleBasedRoute allowedRoles={["admin", "moderator", "organisation"]}>
               <AdminDashboardLayout />
             </RoleBasedRoute>
           }
