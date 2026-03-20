@@ -17,18 +17,24 @@ import {
   ChevronRight,
   File,
   Loader2,
+  Download,
+  Mic,
 } from "lucide-react";
 import { TagsList } from "@/components/TagsList";
 import { UpdateCaseStatusModal } from "./UpdateCaseStatusModal";
+import { ExportCaseModal } from "@/modules/practitioner/cases/ExportCaseModal";
+import { useAuth } from "@/contexts/useAuth";
 
 export const AdminCaseDetailPage = () => {
   const { caseId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isOrganisation = user?.role === "organisation";
   const [timelineFilter, setTimelineFilter] = useState("");
   const [sessionFilter, setSessionFilter] = useState("");
   const [loadAllEntries, setLoadAllEntries] = useState(false);
   const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
-
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   // Fetch case data
   const {
     data: caseData,
@@ -141,12 +147,65 @@ export const AdminCaseDetailPage = () => {
               {caseInfo.status || "Active"}
             </span>
           </div>
-          <Button
-            onClick={() => setIsUpdateStatusModalOpen(true)}
-            className="flex items-center text-white"
-          >
-            Update Case
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {isOrganisation && (
+              <>
+                <Button
+                  onClick={() =>
+                    navigate(`/admin/cases/${caseId}/record-session`)
+                  }
+                  disabled={caseInfo.status !== "Active"}
+                  className="flex items-center gap-2 disabled:opacity-50 text-white disabled:cursor-not-allowed"
+                  title={
+                    caseInfo.status !== "Active"
+                      ? `Cannot record session - case status is ${caseInfo.status}`
+                      : "Record new session"
+                  }
+                >
+                  <Mic className="w-4 h-4" />
+                  Record Session
+                </Button>
+
+                <Button
+                  onClick={() => setIsExportModalOpen(true)}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                </Button>
+              </>
+            )}
+
+            {/* <Button
+              onClick={() => setIsUploadModalOpen(true)}
+              disabled={caseInfo.status !== "Active"}
+              variant="outline"
+              className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={
+                caseInfo.status !== "Active"
+                  ? `Cannot upload file - case status is ${caseInfo.status}`
+                  : "Upload file"
+              }
+            >
+              <Upload className="w-4 h-4" />
+              Upload File
+            </Button> */}
+            {/* <Button
+              onClick={() => setIsExportModalOpen(true)}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </Button> */}
+            <Button
+              onClick={() => setIsUpdateStatusModalOpen(true)}
+              className="flex items-center text-white"
+            >
+              Update Case
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -507,6 +566,21 @@ export const AdminCaseDetailPage = () => {
           </div>
         )}
       </div>
+
+      {/* Export Case Modal */}
+      <ExportCaseModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        caseId={caseId}
+        // caseName={`${caseInfo.internalRef || ""} (${
+        //   caseInfo.displayName || ""
+        // })`}
+        caseName={`${caseInfo.displayName || ""}`}
+        onExportSuccess={(exportData: any) => {
+          console.log("Export case data:", exportData);
+          // Trigger export download
+        }}
+      />
 
       {/* Update Case Status Modal */}
       <UpdateCaseStatusModal
