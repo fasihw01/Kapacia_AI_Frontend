@@ -25,7 +25,7 @@ function SignUpPage() {
     try {
       const userData = await register(organisationName, name, email, password);
       toast.success("Account created successfully!");
-      if (userData?.role === "admin" || userData?.role === "organisation") {
+      if (userData?.role === "admin" || userData?.role === "moderator" || userData?.role === "organisation") {
         navigate("/admin/dashboard");
       } else {
         navigate("/");

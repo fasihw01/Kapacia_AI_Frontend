@@ -24,7 +24,7 @@ export const CreatePractitionerModal = ({
   const [organisationId, setOrganisationId] = useState("");
 
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "moderator";
   const createUserMutation = useCreateUserByAdmin();
   const { data: orgData, isLoading: loadingOrgs } = useAllOrganisations({
     limit: 100,

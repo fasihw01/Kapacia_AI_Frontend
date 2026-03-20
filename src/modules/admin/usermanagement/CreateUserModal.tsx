@@ -21,10 +21,11 @@ export const CreateUserModal = ({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("practitioner");
+  const [role, setRole] = useState("admin");
   const [organisationId, setOrganisationId] = useState("");
 
   const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "moderator";
   const createUserMutation = useCreateUserByAdmin();
   const { data: orgData, isLoading: loadingOrgs } = useAllOrganisations({
     limit: 100,
@@ -156,8 +157,11 @@ export const CreateUserModal = ({
               }}
               className="px-3 py-2 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 w-full"
             >
-              <option value="practitioner">Practitioner</option>
-              {user?.role === "admin" && <option value="admin">Admin</option>}
+              {isAdmin && <option value="admin">Admin</option>}
+              {isAdmin && <option value="moderator">Moderator</option>}
+              {user?.role === "admin" && (
+                <option value="organisation">Organisation</option>
+              )}
             </select>
           </div>
 
