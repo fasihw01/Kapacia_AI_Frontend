@@ -1197,7 +1197,7 @@ export const AdminRecordSessionPage = () => {
   return (
     <div className="flex flex-col space-y-6 mx-auto">
       {/* Header */}
-      <RecordHeader caseId={caseId!} />
+      <RecordHeader caseId={caseId!} basePath="/admin/cases" />
 
       {/* Session Details */}
       <SessionDetailsForm

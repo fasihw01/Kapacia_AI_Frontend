@@ -24,10 +24,14 @@ import { AudioPlayer } from "@/modules/practitioner/cases/components/AudioPlayer
 import { TranscriptionSection } from "@/modules/practitioner/cases/components/TranscriptionSection";
 import { SoapNoteSection } from "@/modules/practitioner/cases/components/SoapNoteSection";
 import { ApprovalSection } from "@/modules/practitioner/cases/components/ApprovalSection";
+import { useAuth } from "@/contexts/useAuth";
 
 export const AdminSessionViewPage = () => {
   const { caseId, sessionId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const casesBasePath =
+    user?.role === "organisation" ? "/admin/cases" : "/practitioner/my-cases";
   const [approvalConfirmed, setApprovalConfirmed] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
@@ -261,7 +265,7 @@ export const AdminSessionViewPage = () => {
         icon: "success",
         confirmButtonColor: "#188aec",
       });
-      navigate(`/practitioner/my-cases/${caseId}`);
+      navigate(`${casesBasePath}/${caseId}`);
     } catch (error) {
       console.error("Failed to delete session:", error);
       Swal.fire({
@@ -390,7 +394,7 @@ export const AdminSessionViewPage = () => {
           Session not found or error loading session
         </p>
         <Button
-          onClick={() => navigate(`/practitioner/my-cases/${caseId}`)}
+          onClick={() => navigate(`${casesBasePath}/${caseId}`)}
           className="mt-4"
         >
           Back to Case
@@ -462,7 +466,7 @@ export const AdminSessionViewPage = () => {
         onOpenChat={() => setIsChatOpen(true)}
         isDeleting={deleteSessionMutation.isPending}
         navigateToCaseTimeline={(id) =>
-          navigate(`/practitioner/my-cases/${id}`)
+          navigate(`${casesBasePath}/${id}`)
         }
       />
 
@@ -504,7 +508,7 @@ export const AdminSessionViewPage = () => {
         isLoading={loadingSoapNotes}
         hasError={soapError}
         onEditClick={() =>
-          navigate(`/practitioner/my-cases/${caseId}/session/${sessionId}/edit`)
+          navigate(`${casesBasePath}/${caseId}/session/${sessionId}/edit`)
         }
       />
 

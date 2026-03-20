@@ -3,16 +3,21 @@ import { ChevronLeft } from "lucide-react";
 
 interface RecordHeaderProps {
   caseId: string;
+  basePath?: string;
 }
 
-export const RecordHeader: React.FC<RecordHeaderProps> = ({ caseId }) => {
+export const RecordHeader: React.FC<RecordHeaderProps> = ({
+  caseId,
+  basePath = "/practitioner/my-cases",
+}) => {
   const navigate = useNavigate();
+  const backPath = `${basePath}/${caseId}`;
 
   return (
     <div>
       <Link
-        to={`/admin/cases/${caseId}`}
-        onClick={() => navigate(`/admin/cases/${caseId}`)}
+        to={backPath}
+        onClick={() => navigate(backPath)}
         className="flex items-center gap-2 mr-auto mb-4 text-accent hover:text-secondary transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
