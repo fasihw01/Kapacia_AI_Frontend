@@ -11,8 +11,8 @@ export const RecordHeader: React.FC<RecordHeaderProps> = ({ caseId }) => {
   return (
     <div>
       <Link
-        to={`/practitioner/my-cases/${caseId}`}
-        onClick={() => navigate(`/practitioner/my-cases/${caseId}`)}
+        to={`/admin/cases/${caseId}`}
+        onClick={() => navigate(`/admin/cases/${caseId}`)}
         className="flex items-center gap-2 mr-auto mb-4 text-accent hover:text-secondary transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
