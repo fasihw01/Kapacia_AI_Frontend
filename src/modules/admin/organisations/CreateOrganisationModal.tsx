@@ -1,48 +1,58 @@
 import { useState } from "react";
-import { X, Loader2, ChevronDown } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCreateUserByAdmin } from "@/hooks/useUsers";
-import { useAllOrganisations } from "@/hooks/useOrganisations";
+import { useCreateOrganisation } from "@/hooks/useOrganisations";
 import { toast } from "react-toastify";
-import { useAuth } from "@/contexts/useAuth";
 
-interface CreateUserModalProps {
+interface CreateOrganisationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateSuccess?: () => void;
 }
 
-export const CreateUserModal = ({
+export const CreateOrganisationModal = ({
   isOpen,
   onClose,
   onCreateSuccess,
-}: CreateUserModalProps) => {
+}: CreateOrganisationModalProps) => {
+  const [organisationName, setOrganisationName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("practitioner");
-  const [organisationId, setOrganisationId] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const { user } = useAuth();
-  const createUserMutation = useCreateUserByAdmin();
-  const { data: orgData, isLoading: loadingOrgs } = useAllOrganisations({
-    limit: 100,
-  });
+  const createMutation = useCreateOrganisation();
+
+  const resetForm = () => {
+    setOrganisationName("");
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
+    if (!organisationName.trim()) {
+      toast.error("Organisation name is required");
+      return;
+    }
     if (!name.trim()) {
-      toast.error("Name is required");
+      toast.error("Full name is required");
       return;
     }
     if (!email.trim()) {
       toast.error("Email is required");
       return;
     }
-    if (!password.trim()) {
+    if (!password) {
       toast.error("Password is required");
       return;
     }
@@ -50,34 +60,26 @@ export const CreateUserModal = ({
       toast.error("Password must be at least 6 characters");
       return;
     }
-    if (role === "practitioner" && !organisationId) {
-      toast.error("Please select an organisation for this practitioner");
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
-      const payload: any = {
+      await createMutation.mutateAsync({
+        organisationName: organisationName.trim(),
         name: name.trim(),
         email: email.trim(),
         password,
-        role,
-      };
-      if (role === "practitioner" && organisationId) {
-        payload.organisationId = organisationId;
-      }
+        role: "organisation",
+      });
 
-      await createUserMutation.mutateAsync(payload);
-
-      toast.success("User created successfully!");
-      setName("");
-      setEmail("");
-      setPassword("");
-      setRole("practitioner");
-      setOrganisationId("");
+      toast.success("Organisation created successfully!");
+      resetForm();
       onCreateSuccess?.();
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Failed to create user");
+      toast.error(error.message || "Failed to create organisation");
     }
   };
 
@@ -89,10 +91,10 @@ export const CreateUserModal = ({
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="font-semibold text-secondary text-xl">
-            Create New User
+            Create New Organisation
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-primary/10 p-2 rounded-full text-primary hover:text-primary/80 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -100,8 +102,25 @@ export const CreateUserModal = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 p-6">
-          {/* Name */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 p-6 max-h-[70vh] overflow-y-auto"
+        >
+          {/* Organisation Name */}
+          <div>
+            <label className="block mb-1 font-medium text-secondary text-sm">
+              Organisation Name
+            </label>
+            <Input
+              type="text"
+              value={organisationName}
+              onChange={(e) => setOrganisationName(e.target.value)}
+              placeholder="Enter organisation name"
+              className="w-full"
+            />
+          </div>
+
+          {/* Full Name */}
           <div>
             <label className="block mb-1 font-medium text-secondary text-sm">
               Full Name
@@ -110,7 +129,7 @@ export const CreateUserModal = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter full name"
+              placeholder="Enter admin full name"
               className="w-full"
             />
           </div>
@@ -143,76 +162,41 @@ export const CreateUserModal = ({
             />
           </div>
 
-          {/* Role */}
+          {/* Confirm Password */}
           <div>
             <label className="block mb-1 font-medium text-secondary text-sm">
-              Role
+              Confirm Password
             </label>
-            <select
-              value={role}
-              onChange={(e) => {
-                setRole(e.target.value);
-                setOrganisationId("");
-              }}
-              className="px-3 py-2 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 w-full"
-            >
-              <option value="practitioner">Practitioner</option>
-              {user?.role === "admin" && <option value="admin">Admin</option>}
-            </select>
+            <Input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter password"
+              className="w-full"
+            />
           </div>
-
-          {/* Organisation (only for practitioner role) */}
-          {role === "practitioner" && (
-            <div>
-              <label className="block mb-1 font-medium text-secondary text-sm">
-                Organisation
-              </label>
-              <div className="relative">
-                <select
-                  value={organisationId}
-                  onChange={(e) => setOrganisationId(e.target.value)}
-                  className="px-3 py-2 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 w-full appearance-none"
-                  disabled={loadingOrgs}
-                >
-                  <option value="">
-                    {loadingOrgs
-                      ? "Loading organisations..."
-                      : "Select organisation"}
-                  </option>
-                  {(orgData?.organisations || orgData?.users || []).map(
-                    (org: any) => (
-                      <option key={org._id} value={org._id}>
-                        {org.organisationName || org.name}
-                      </option>
-                    ),
-                  )}
-                </select>
-                <ChevronDown className="top-1/2 right-3 absolute w-4 h-4 text-gray-400 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-          )}
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={createUserMutation.isPending}
+              disabled={createMutation.isPending}
               className="flex-1 bg-primary hover:bg-primary/90 text-white"
             >
-              {createUserMutation.isPending ? (
+              {createMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                   Creating...
                 </>
               ) : (
-                "Create User"
+                "Create Organisation"
               )}
             </Button>
           </div>

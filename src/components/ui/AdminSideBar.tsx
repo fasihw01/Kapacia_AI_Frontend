@@ -1,39 +1,63 @@
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { NavLink, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/useAuth";
 
 const PractitionerSideBar = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const isOrganisation = user?.role === "organisation";
+
   const items = [
     {
       key: "dashboard",
       label: "Dashboard",
       to: "/admin/dashboard",
       icon: "dash",
+      show: true,
     },
     {
       key: "my-classes",
       label: "All Cases",
       to: "/admin/cases",
       icon: "class",
+      show: true,
     },
     {
       key: "user-management",
       label: "User Management",
       to: "/admin/user-management",
       icon: "user",
+      show: isAdmin,
+    },
+    {
+      key: "practitioners",
+      label: "Practitioners",
+      to: "/admin/practitioners",
+      icon: "user",
+      show: isOrganisation || isAdmin,
+    },
+    {
+      key: "organisation-management",
+      label: "Organisations",
+      to: "/admin/organisation-management",
+      icon: "user",
+      show: isAdmin,
     },
     {
       key: "audit-logs",
       label: "Audit Logs",
       to: "/admin/audit-logs",
       icon: "audit",
+      show: true,
     },
     {
       key: "settings",
       label: "Settings",
       to: "/admin/settings",
       icon: "setting",
+      show: true,
     },
-  ];
+  ].filter((item) => item.show);
   return (
     <aside className="flex flex-col justify-between bg-white border-border/60 border-r w-64 h-full">
       <div>

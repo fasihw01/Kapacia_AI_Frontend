@@ -10,6 +10,21 @@ interface LoginResponse {
   timestamp: string;
 }
 
+interface SignupResponse {
+  success: boolean;
+  message: string;
+  userData: UserData;
+  timestamp: string;
+}
+
+export interface RegisterPayload {
+  organisationName: string;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
 interface UserResponse {
   success: boolean;
   message: string;
@@ -74,6 +89,52 @@ export const loginUser = async (
     }
 
     const message = error instanceof Error ? error.message : "Failed to login";
+    throw new Error(message);
+  }
+};
+
+// Register a new organisation
+export const registerOrganisation = async (
+  payload: RegisterPayload,
+): Promise<UserData> => {
+  try {
+    const response = await axios.post<SignupResponse>(
+      `${API_BASE_URL}${API_ENDPOINTS.ORGANISATION_SIGNUP}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    console.log("response.data from registerUser", response.data.userData);
+    return response.data.userData;
+  } catch (error) {
+    console.error("Register API error:", error);
+
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<any>;
+      const errorData = axiosError.response?.data;
+
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (errorData) {
+        if (errorData.error?.message) {
+          errorMessage = errorData.error.message;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.userMessage) {
+          errorMessage = errorData.userMessage;
+        } else if (typeof errorData.error === "string") {
+          errorMessage = errorData.error;
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const message =
+      error instanceof Error ? error.message : "Failed to register";
     throw new Error(message);
   }
 };

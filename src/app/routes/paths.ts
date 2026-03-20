@@ -2,7 +2,7 @@ export const paths = {
   home: "/",
   adminDashboard: "/admin/dashboard",
   practitionerDashboard: "/practitioner/dashboard",
-  signup: "/signup",
+  signup: "/organisation-signup",
   login: "/login",
   forgotPassword: "/forgot-password",
   otpverify: "/otp-verify",

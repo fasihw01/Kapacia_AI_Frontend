@@ -4,6 +4,7 @@ import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { paths } from "./paths";
 import { PractictionerDashboardLayout } from "@/components/layouts/PractictionerDashboardLayout";
 import LoginPage from "@/modules/login/LoginPage";
+import SignUpPage from "@/modules/signup/SignUpPage";
 import ForgotPassPage from "@/modules/forgotpass/ForgotPassPage";
 import OtpVerifyPage from "@/modules/otpverify/OtpVerifyPage";
 import ResetPassPage from "@/modules/resetpass/ResetPassPage";
@@ -32,6 +33,8 @@ import { AuditPage as PractitionerAuditPage } from "@/modules/practitioner/audit
 import { AdminCaseDetailPage } from "@/modules/admin/cases/AdminCaseDetailPage";
 import { AdminSessionViewPage } from "@/modules/admin/cases/AdminSessionViewPage";
 import { AdminSummaryDetailPage } from "@/modules/admin/cases/AdminSummaryDetailPage";
+import { OrganisationManagementPage } from "@/modules/admin/organisations/OrganisationManagementPage";
+import { PractitionersPage } from "@/modules/admin/practitioners/PractitionersPage";
 
 export function AppRoutes() {
   return (
@@ -43,6 +46,7 @@ export function AppRoutes() {
         {/* Auth pages with Dashboard background + Navbar + Footer */}
         <Route element={<AuthLayout />}>
           <Route path={paths.login} element={<LoginPage />} />
+          <Route path={paths.signup} element={<SignUpPage />} />
           <Route path={paths.forgotPassword} element={<ForgotPassPage />} />
           <Route path={paths.otpverify} element={<OtpVerifyPage />} />
           <Route path={paths.resetPassword} element={<ResetPassPage />} />
@@ -56,7 +60,7 @@ export function AppRoutes() {
         <Route
           path="/admin"
           element={
-            <RoleBasedRoute allowedRoles={["admin"]}>
+            <RoleBasedRoute allowedRoles={["admin", "organisation"]}>
               <AdminDashboardLayout />
             </RoleBasedRoute>
           }
@@ -75,6 +79,11 @@ export function AppRoutes() {
             element={<AdminSummaryDetailPage />}
           />
           <Route path="user-management" element={<UserManagementPage />} />
+          <Route path="practitioners" element={<PractitionersPage />} />
+          <Route
+            path="organisation-management"
+            element={<OrganisationManagementPage />}
+          />
           <Route
             path="supervision-management"
             element={<SupervisionManagementPage />}

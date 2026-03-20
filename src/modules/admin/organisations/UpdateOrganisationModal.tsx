@@ -3,49 +3,47 @@ import { X, Loader2, Power } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  useUpdateUserCredentials,
-  useToggleUserStatus,
-} from "@/hooks/useUsers";
+  useUpdateOrganisation,
+  useToggleOrganisationStatus,
+} from "@/hooks/useOrganisations";
 import { toast } from "react-toastify";
 
-interface UpdateUserModalProps {
+interface UpdateOrganisationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  organisation: any;
   onUpdateSuccess?: () => void;
 }
 
-export const UpdateUserModal = ({
+export const UpdateOrganisationModal = ({
   isOpen,
   onClose,
-  user,
+  organisation,
   onUpdateSuccess,
-}: UpdateUserModalProps) => {
-  const [name, setName] = useState("");
+}: UpdateOrganisationModalProps) => {
+  const [organisationName, setOrganisationName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("practitioner");
   const [showPasswordField, setShowPasswordField] = useState(false);
 
-  const updateUserMutation = useUpdateUserCredentials();
-  const toggleStatusMutation = useToggleUserStatus();
+  const updateMutation = useUpdateOrganisation();
+  const toggleStatusMutation = useToggleOrganisationStatus();
 
   useEffect(() => {
-    if (user && isOpen) {
-      setName(user.name || "");
-      setEmail(user.email || "");
+    if (organisation && isOpen) {
+      console.log("organisation from UpdateOrganisationModal", organisation);
+      setOrganisationName(organisation.organisationName || "");
+      setEmail(organisation?.createdBy?.email || "");
       setPassword("");
-      setRole(user.role || "practitioner");
       setShowPasswordField(false);
     }
-  }, [user, isOpen]);
+  }, [organisation, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!name.trim()) {
-      toast.error("Name is required");
+    if (!organisationName.trim()) {
+      toast.error("Organisation name is required");
       return;
     }
     if (!email.trim()) {
@@ -59,51 +57,52 @@ export const UpdateUserModal = ({
 
     try {
       const updateData: any = {
-        name: name.trim(),
+        organisationName: organisationName.trim(),
         email: email.trim(),
-        role,
       };
 
       if (showPasswordField && password) {
         updateData.password = password;
       }
 
-      await updateUserMutation.mutateAsync({
-        userId: user._id,
+      await updateMutation.mutateAsync({
+        orgId: organisation._id,
         data: updateData,
       });
 
-      toast.success("User updated successfully!");
+      toast.success("Organisation updated successfully!");
       onUpdateSuccess?.();
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Failed to update user");
+      toast.error(error.message || "Failed to update organisation");
     }
   };
 
   const handleToggleStatus = async () => {
-    try {
-      await toggleStatusMutation.mutateAsync({
-        userId: user._id,
-        active: !user.active,
-      });
-
-      const status = !user.active ? "enabled" : "disabled";
-      toast.success(`User ${status} successfully!`);
-      onUpdateSuccess?.();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to toggle user status");
-    }
+    //TODO: Add toggle organisation status
+    // try {
+    //   await toggleStatusMutation.mutateAsync({
+    //     orgId: organisation._id,
+    //     active: !organisation.active,
+    //   });
+    //   const status = !organisation.active ? "enabled" : "disabled";
+    //   toast.success(`Organisation ${status} successfully!`);
+    //   onUpdateSuccess?.();
+    // } catch (error: any) {
+    //   toast.error(error.message || "Failed to toggle organisation status");
+    // }
   };
 
-  if (!isOpen || !user) return null;
+  if (!isOpen || !organisation) return null;
 
   return (
     <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 p-2">
       <div className="bg-white shadow-xl rounded-lg w-full max-w-xl">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="font-semibold text-secondary text-xl">Edit User</h2>
+          <h2 className="font-semibold text-secondary text-xl">
+            Edit Organisation
+          </h2>
           <button
             onClick={onClose}
             className="bg-primary/10 p-2 rounded-full text-primary hover:text-primary/80 transition-colors cursor-pointer"
@@ -117,22 +116,16 @@ export const UpdateUserModal = ({
           onSubmit={handleSubmit}
           className="space-y-4 p-6 max-h-[70vh] overflow-y-auto"
         >
-          {/* User ID Info */}
-          {/* <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-gray-500 text-xs">User ID</p>
-            <p className="font-medium text-secondary text-sm">{user._id}</p>
-          </div> */}
-
-          {/* Name */}
+          {/* Organisation Name */}
           <div>
             <label className="block mb-1 font-medium text-secondary text-sm">
-              Full Name
+              Organisation Name
             </label>
             <Input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter full name"
+              value={organisationName}
+              onChange={(e) => setOrganisationName(e.target.value)}
+              placeholder="Enter organisation name"
               className="w-full"
             />
           </div>
@@ -185,28 +178,12 @@ export const UpdateUserModal = ({
             </div>
           )}
 
-          {/* Role */}
-          <div>
-            <label className="block mb-1 font-medium text-secondary text-sm">
-              Role
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="px-3 py-2 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 w-full"
-            >
-              <option value="practitioner">Practitioner</option>
-              <option value="admin">Admin</option>
-              <option value="organisation">Organisation</option>
-            </select>
-          </div>
-
-          {/* Status Info */}
+          {/* Status */}
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="text-accent text-xs">Status</p>
             <div className="flex justify-between items-center mt-2">
               <p className="font-medium text-secondary text-sm">
-                {user.active ? (
+                {organisation.active ? (
                   <span className="text-ring">Active</span>
                 ) : (
                   <span className="text-destructive">Disabled</span>
@@ -217,7 +194,7 @@ export const UpdateUserModal = ({
                 onClick={handleToggleStatus}
                 disabled={toggleStatusMutation.isPending}
                 className={`h-8 px-3 text-xs ${
-                  user.active
+                  organisation.active
                     ? "bg-destructive/20 hover:bg-destructive/30 text-destructive"
                     : "bg-ring/20 hover:bg-ring/30 text-ring"
                 }`}
@@ -227,7 +204,7 @@ export const UpdateUserModal = ({
                 ) : (
                   <>
                     <Power className="inline mr-1 w-3 h-3" />
-                    {user.active ? "Disable" : "Enable"}
+                    {organisation.active ? "Disable" : "Enable"}
                   </>
                 )}
               </Button>
@@ -238,8 +215,8 @@ export const UpdateUserModal = ({
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="text-accent text-xs">Created</p>
             <p className="font-medium text-secondary text-sm">
-              {user.createdAt
-                ? new Date(user.createdAt).toLocaleDateString("en-US", {
+              {organisation.createdAt
+                ? new Date(organisation.createdAt).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
@@ -254,8 +231,8 @@ export const UpdateUserModal = ({
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="text-accent text-xs">Last Updated</p>
             <p className="font-medium text-secondary text-sm">
-              {user.updatedAt
-                ? new Date(user.updatedAt).toLocaleDateString("en-US", {
+              {organisation.updatedAt
+                ? new Date(organisation.updatedAt).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
@@ -278,16 +255,16 @@ export const UpdateUserModal = ({
             </Button>
             <Button
               type="submit"
-              disabled={updateUserMutation.isPending}
+              disabled={updateMutation.isPending}
               className="flex-1 bg-primary hover:bg-primary/90 text-white"
             >
-              {updateUserMutation.isPending ? (
+              {updateMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                   Updating...
                 </>
               ) : (
-                "Update User"
+                "Update Organisation"
               )}
             </Button>
           </div>
