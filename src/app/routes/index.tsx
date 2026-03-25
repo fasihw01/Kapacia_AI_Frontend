@@ -31,11 +31,15 @@ import { AuditPage } from "@/modules/admin/audit/AuditPage";
 import { AuditPage as PractitionerAuditPage } from "@/modules/practitioner/audit/AuditPage";
 // import AdminCasePageDetails from "@/modules/admin/cases/AdminCasePageDetails";
 import { AdminCaseDetailPage } from "@/modules/admin/cases/AdminCaseDetailPage";
-import { AdminRecordSessionPage } from "@/modules/admin/cases/AdminRecordSessionPage";
+// import { AdminRecordSessionPage } from "@/modules/admin/cases/AdminRecordSessionPage";
 import { AdminSessionViewPage } from "@/modules/admin/cases/AdminSessionViewPage";
 import { AdminSummaryDetailPage } from "@/modules/admin/cases/AdminSummaryDetailPage";
 import { OrganisationManagementPage } from "@/modules/admin/organisations/OrganisationManagementPage";
 import { PractitionersPage } from "@/modules/admin/practitioners/PractitionersPage";
+import PaymentConfirmationPage from "@/modules/payment/PaymentConfirmationPage";
+import { SubscriptionPage } from "@/modules/admin/subscription/SubscriptionPage";
+import { SubscriptionSuccessPage } from "@/modules/admin/subscription/SubscriptionSuccessPage";
+import OrganisationSubscriptionRequiredPage from "@/modules/admin/subscription/OrganisationSubscriptionRequiredPage";
 
 export function AppRoutes() {
   return (
@@ -73,10 +77,10 @@ export function AppRoutes() {
           <Route path="cases" element={<AdminCasesPage />} />
           {/* <Route path="cases/:caseId" element={<AdminCasePageDetails />} /> */}
           <Route path="cases/:caseId" element={<AdminCaseDetailPage />} />
-          <Route
+          {/* <Route
             path="cases/:caseId/record-session"
             element={<AdminRecordSessionPage />}
-          />
+          /> */}
           <Route
             path="cases/:caseId/session/:sessionId"
             element={<AdminSessionViewPage />}
@@ -97,6 +101,7 @@ export function AppRoutes() {
           />
           <Route path="audit-logs" element={<AuditPage />} />
           <Route path="settings" element={<AdminSettingPage />} />
+          <Route path="subscription" element={<SubscriptionPage />} />
         </Route>
 
         {/* Practitioner Dashboard */}
@@ -134,6 +139,36 @@ export function AppRoutes() {
           <Route path="audit-logs" element={<PractitionerAuditPage />} />
           <Route path="settings" element={<SettingPage />} />
         </Route>
+
+        {/* Payment confirmation after organisation registration */}
+        <Route
+          path={paths.paymentConfirmation}
+          element={
+            <RoleBasedRoute allowedRoles={["organisation"]}>
+              <PaymentConfirmationPage />
+            </RoleBasedRoute>
+          }
+        />
+
+        {/* Organisation forced subscription screen (no sidebar) */}
+        <Route
+          path={paths.organisationSubscriptionRequired}
+          element={
+            <RoleBasedRoute allowedRoles={["organisation"]}>
+              <OrganisationSubscriptionRequiredPage />
+            </RoleBasedRoute>
+          }
+        />
+
+        {/* Stripe checkout success redirect */}
+        <Route
+          path={paths.subscriptionSuccess}
+          element={
+            <RoleBasedRoute allowedRoles={["admin", "moderator", "organisation"]}>
+              <SubscriptionSuccessPage />
+            </RoleBasedRoute>
+          }
+        />
 
         {/* 404 - Catch all unmatched routes */}
         <Route path="*" element={<NotFoundPage />} />

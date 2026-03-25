@@ -5,6 +5,7 @@ export interface UserData {
   name: string;
   email: string;
   role: string;
+  subscriptionStatus?: string;
   createdAt: string;
   updatedAt: string;
   token: string;
@@ -13,6 +14,9 @@ export interface UserData {
   customSoapPrompt: string;
   supervisor?: string | null;
   masterSoapPrompt?: string | null;
+  organisation?: {
+    subscriptionStatus?: string;
+  };
 }
 
 export interface AuthContextType {

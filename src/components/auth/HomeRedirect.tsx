@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
+import { paths } from "@/app/routes/paths";
 
 const HomeRedirect = () => {
   const navigate = useNavigate();
@@ -12,21 +13,39 @@ const HomeRedirect = () => {
 
     if (!isAuthenticated) {
       // Not logged in - redirect to login
-      navigate('/login', { replace: true });
+      navigate(paths.login, { replace: true });
       return;
     }
 
+    console.log("user in home redirect", user);
     // Logged in - redirect based on role
     if (user) {
       switch (user.role) {
         case "admin":
           navigate("/admin/dashboard", { replace: true });
           break;
+        case "moderator":
+          navigate("/admin/dashboard", { replace: true });
+          break;
         case "practitioner":
           navigate("/practitioner/dashboard", { replace: true });
           break;
+        case "organisation": {
+          console.log("user in organisation redirect", user);
+          navigate(paths.adminDashboard, { replace: true });
+
+          // const status = user.organisation?.subscriptionStatus;
+          // const isActive =
+          //   typeof status === "string" && status.toLowerCase() === "active";
+          // if (isActive) {
+
+          // } else {
+          //   navigate(paths.organisationSubscriptionRequired, { replace: true });
+          // }
+          break;
+        }
         default:
-          navigate('/login', { replace: true });
+          navigate(paths.login, { replace: true });
       }
     }
   }, [isAuthenticated, isLoading, user, navigate]);

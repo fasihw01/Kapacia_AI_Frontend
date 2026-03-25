@@ -1,12 +1,17 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import AdminSideBar from "../ui/AdminSideBar";
 import AdminNavBar from "../ui/AdminNavBar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { useAuth } from "@/contexts/useAuth";
+import { paths } from "@/app/routes/paths";
 
 export function AdminDashboardLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const { user, isLoading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleCloseSidebar = () => {
     setIsClosing(true);

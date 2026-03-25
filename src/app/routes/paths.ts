@@ -8,4 +8,8 @@ export const paths = {
   otpverify: "/otp-verify",
   resetPassword: "/reset-password",
   successPassword: "/success-password",
+  paymentConfirmation: "/payment-confirmation",
+  subscription: "/admin/subscription",
+  organisationSubscriptionRequired: "/organisation/subscription",
+  subscriptionSuccess: "/subscription/success",
 } as const;

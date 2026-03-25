@@ -51,6 +51,13 @@ const PractitionerSideBar = () => {
       show: true,
     },
     {
+      key: "subscription",
+      label: "Subscription",
+      to: "/admin/subscription",
+      icon: "setting",
+      show: isOrganisation,
+    },
+    {
       key: "settings",
       label: "Settings",
       to: "/admin/settings",
