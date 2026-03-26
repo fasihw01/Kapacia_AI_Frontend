@@ -31,7 +31,7 @@ import { AuditPage } from "@/modules/admin/audit/AuditPage";
 import { AuditPage as PractitionerAuditPage } from "@/modules/practitioner/audit/AuditPage";
 // import AdminCasePageDetails from "@/modules/admin/cases/AdminCasePageDetails";
 import { AdminCaseDetailPage } from "@/modules/admin/cases/AdminCaseDetailPage";
-// import { AdminRecordSessionPage } from "@/modules/admin/cases/AdminRecordSessionPage";
+import { AdminRecordSessionPage } from "@/modules/admin/cases/AdminRecordSessionPage";
 import { AdminSessionViewPage } from "@/modules/admin/cases/AdminSessionViewPage";
 import { AdminSummaryDetailPage } from "@/modules/admin/cases/AdminSummaryDetailPage";
 import { OrganisationManagementPage } from "@/modules/admin/organisations/OrganisationManagementPage";
@@ -73,10 +73,10 @@ export function AppRoutes() {
           <Route path="cases" element={<AdminCasesPage />} />
           {/* <Route path="cases/:caseId" element={<AdminCasePageDetails />} /> */}
           <Route path="cases/:caseId" element={<AdminCaseDetailPage />} />
-          {/* <Route
+          <Route
             path="cases/:caseId/record-session"
             element={<AdminRecordSessionPage />}
-          /> */}
+          />
           <Route
             path="cases/:caseId/session/:sessionId"
             element={<AdminSessionViewPage />}

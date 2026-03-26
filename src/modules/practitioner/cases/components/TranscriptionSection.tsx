@@ -28,31 +28,22 @@ interface TranscriptionSectionProps {
   isRegenerating: boolean;
 }
 
-const formatTranscriptTimestamp = (timestamp: string | number) => {
-  if (typeof timestamp === "number") {
-    const hrs = Math.floor(timestamp / 3600);
-    const mins = Math.floor((timestamp % 3600) / 60);
-    const secs = Math.floor(timestamp % 60);
-    return `${hrs.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  }
+const toSeconds = (timestamp: string | number): number => {
+  if (typeof timestamp === "number") return timestamp;
+  // ISO string e.g. "2026-03-26T11:20:25.171Z"
+  const ms = Date.parse(timestamp);
+  if (!isNaN(ms)) return ms / 1000;
+  return 0;
+};
 
-  const parts = timestamp.split(":");
-  if (parts.length === 3) {
-    const firstPart = parseInt(parts[0]);
-    if (firstPart > 1000) {
-      const totalSeconds = Math.floor(firstPart / 1000);
-      const hrs = Math.floor(totalSeconds / 3600);
-      const mins = Math.floor((totalSeconds % 3600) / 60);
-      const secs = totalSeconds % 60;
-      return `${hrs.toString().padStart(2, "0")}:${mins
-        .toString()
-        .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    }
-  }
-
-  return timestamp;
+const formatElapsed = (totalSeconds: number): string => {
+  const s = Math.max(0, Math.floor(totalSeconds));
+  const hrs = Math.floor(s / 3600);
+  const mins = Math.floor((s % 3600) / 60);
+  const secs = s % 60;
+  return `${hrs.toString().padStart(2, "0")}:${mins
+    .toString()
+    .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
 export const TranscriptionSection = ({
@@ -86,29 +77,32 @@ export const TranscriptionSection = ({
           {/* Transcript Segments */}
           <div className="space-y-3 bg-primary/5 p-4 rounded-lg max-h-96 overflow-y-auto text-accent text-sm leading-relaxed">
             {transcriptData.segments && transcriptData.segments.length > 0 ? (
-              transcriptData.segments.map((segment, index: number) => (
-                <div
-                  key={segment.id || index}
-                  className="pb-3 border-b last:border-b-0"
-                >
-                  <div className="flex items-start gap-2">
-                    <span className="min-w-fit font-semibold text-primary">
-                      [{formatTranscriptTimestamp(segment.timestamp)}]
-                    </span>
-                    <div className="flex-1">
-                      <span className="font-medium text-secondary">
-                        {segment.speaker}:
+              (() => {
+                const baseSeconds = toSeconds(transcriptData.segments[0].timestamp);
+                return transcriptData.segments.map((segment, index: number) => (
+                  <div
+                    key={segment.id || index}
+                    className="pb-3 border-b last:border-b-0"
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="min-w-fit font-semibold text-primary">
+                        [{formatElapsed(toSeconds(segment.timestamp) - baseSeconds)}]
                       </span>
-                      <p className="mt-1 text-accent">{segment.text}</p>
+                      <div className="flex-1">
+                        <span className="font-medium text-secondary">
+                          {segment.speaker}:
+                        </span>
+                        <p className="mt-1 text-accent">{segment.text}</p>
+                      </div>
+                      {segment.isFinal && (
+                        <span className="bg-green-100 px-2 py-1 rounded font-medium text-green-700 text-xs">
+                          Final
+                        </span>
+                      )}
                     </div>
-                    {segment.isFinal && (
-                      <span className="bg-green-100 px-2 py-1 rounded font-medium text-green-700 text-xs">
-                        Final
-                      </span>
-                    )}
                   </div>
-                </div>
-              ))
+                ));
+              })()
             ) : (
               <p className="text-accent italic">{transcriptData.rawText}</p>
             )}
