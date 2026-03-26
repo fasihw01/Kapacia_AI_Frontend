@@ -9,6 +9,9 @@ import ForgotPassPage from "@/modules/forgotpass/ForgotPassPage";
 import OtpVerifyPage from "@/modules/otpverify/OtpVerifyPage";
 import ResetPassPage from "@/modules/resetpass/ResetPassPage";
 import RoleBasedRoute from "@/components/auth/RoleBasedRoute";
+import OrganisationSubscriptionGuard, {
+  OrganisationSubscriptionPageGuard,
+} from "@/components/auth/OrganisationSubscriptionGuard";
 import SuccessPasswordPage from "@/modules/successpass/SuccessPasswordPage";
 import { AdminDashboardLayout } from "@/components/layouts/AdminDashboardLayout";
 import NotFoundPage from "@/modules/notfound/NotFoundPage";
@@ -68,7 +71,9 @@ export function AppRoutes() {
             <RoleBasedRoute
               allowedRoles={["admin", "moderator", "organisation"]}
             >
-              <AdminDashboardLayout />
+              <OrganisationSubscriptionGuard>
+                <AdminDashboardLayout />
+              </OrganisationSubscriptionGuard>
             </RoleBasedRoute>
           }
         >
@@ -155,7 +160,9 @@ export function AppRoutes() {
           path={paths.organisationSubscriptionRequired}
           element={
             <RoleBasedRoute allowedRoles={["organisation"]}>
-              <OrganisationSubscriptionRequiredPage />
+              <OrganisationSubscriptionPageGuard>
+                <OrganisationSubscriptionRequiredPage />
+              </OrganisationSubscriptionPageGuard>
             </RoleBasedRoute>
           }
         />

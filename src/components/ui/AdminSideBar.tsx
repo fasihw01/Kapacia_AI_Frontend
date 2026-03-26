@@ -1,69 +1,33 @@
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
+import { CreditCard } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+interface NavItem {
+  key: string;
+  label: string;
+  to: string;
+  icon: string;
+  lucideIcon?: LucideIcon;
+  show: boolean;
+}
 
 const PractitionerSideBar = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin" || user?.role === "moderator";
   const isOrganisation = user?.role === "organisation";
 
-  const items = [
-    {
-      key: "dashboard",
-      label: "Dashboard",
-      to: "/admin/dashboard",
-      icon: "dash",
-      show: true,
-    },
-    {
-      key: "my-classes",
-      label: "All Cases",
-      to: "/admin/cases",
-      icon: "class",
-      show: isOrganisation,
-    },
-    {
-      key: "user-management",
-      label: "User Management",
-      to: "/admin/user-management",
-      icon: "user",
-      show: isAdmin,
-    },
-    {
-      key: "practitioners",
-      label: "Practitioners",
-      to: "/admin/practitioners",
-      icon: "user",
-      show: isOrganisation,
-    },
-    {
-      key: "organisation-management",
-      label: "Organisations",
-      to: "/admin/organisation-management",
-      icon: "user",
-      show: isAdmin,
-    },
-    {
-      key: "audit-logs",
-      label: "Audit Logs",
-      to: "/admin/audit-logs",
-      icon: "audit",
-      show: true,
-    },
-    {
-      key: "subscription",
-      label: "Subscription",
-      to: "/admin/subscription",
-      icon: "setting",
-      show: isOrganisation,
-    },
-    {
-      key: "settings",
-      label: "Settings",
-      to: "/admin/settings",
-      icon: "setting",
-      show: true,
-    },
+  const items: NavItem[] = [
+    { key: "dashboard", label: "Dashboard", to: "/admin/dashboard", icon: "dash", show: true },
+    { key: "my-classes", label: "All Cases", to: "/admin/cases", icon: "class", show: isOrganisation },
+    { key: "user-management", label: "User Management", to: "/admin/user-management", icon: "user", show: isAdmin },
+    { key: "practitioners", label: "Practitioners", to: "/admin/practitioners", icon: "user", show: isOrganisation },
+    { key: "organisation-management", label: "Organisations", to: "/admin/organisation-management", icon: "user", show: isAdmin },
+    { key: "audit-logs", label: "Audit Logs", to: "/admin/audit-logs", icon: "audit", show: true },
+    { key: "subscription", label: "Subscription", to: "/admin/subscription", icon: "", lucideIcon: CreditCard, show: isOrganisation },
+    { key: "subscription-admin", label: "Subscription", to: "/admin/subscription", icon: "", lucideIcon: CreditCard, show: isAdmin },
+    { key: "settings", label: "Settings", to: "/admin/settings", icon: "setting", show: true },
   ].filter((item) => item.show);
   return (
     <aside className="flex flex-col justify-between bg-white border-border/60 border-r w-64 h-full">
@@ -97,15 +61,21 @@ const PractitionerSideBar = () => {
             >
               {({ isActive }) => (
                 <>
-                  <img
-                    src={
-                      isActive
-                        ? `/images/admin/active/${it.icon}.svg`
-                        : `/images/admin/${it.icon}.svg`
-                    }
-                    alt={it.label}
-                    className="w-5 h-5"
-                  />
+                  {it.lucideIcon ? (
+                    <it.lucideIcon
+                      className={`w-5 h-5 ${isActive ? "text-primary" : "text-gray-500"}`}
+                    />
+                  ) : (
+                    <img
+                      src={
+                        isActive
+                          ? `/images/admin/active/${it.icon}.svg`
+                          : `/images/admin/${it.icon}.svg`
+                      }
+                      alt={it.label}
+                      className="w-5 h-5"
+                    />
+                  )}
                   <span className="font-medium">{it.label}</span>
                 </>
               )}

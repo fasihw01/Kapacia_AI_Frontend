@@ -31,17 +31,15 @@ const HomeRedirect = () => {
           navigate("/practitioner/dashboard", { replace: true });
           break;
         case "organisation": {
-          console.log("user in organisation redirect", user);
-          navigate(paths.adminDashboard, { replace: true });
-
-          // const status = user.organisation?.subscriptionStatus;
-          // const isActive =
-          //   typeof status === "string" && status.toLowerCase() === "active";
-          // if (isActive) {
-
-          // } else {
-          //   navigate(paths.organisationSubscriptionRequired, { replace: true });
-          // }
+          const status = user.organisation?.subscriptionStatus;
+          const isActive =
+            typeof status === "string" &&
+            ["active", "trialing"].includes(status.toLowerCase());
+          if (isActive) {
+            navigate(paths.adminDashboard, { replace: true });
+          } else {
+            navigate(paths.organisationSubscriptionRequired, { replace: true });
+          }
           break;
         }
         default:

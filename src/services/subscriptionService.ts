@@ -104,6 +104,43 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
   throw new Error("Failed to load subscription plans.");
 };
 
+export interface OrgSubscription {
+  subscriptionId?: string;
+  status: string;
+  planName?: string;
+  amount?: number;
+  currency?: string;
+  interval?: string;
+  priceId?: string;
+  cancelAtPeriodEnd?: boolean;
+  currentPeriodEnd?: string | null;
+}
+
+export interface PaymentHistoryItem {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  created: number; // unix timestamp
+  description?: string;
+}
+
+export const getOrgSubscription = async (): Promise<OrgSubscription> => {
+  const response = await axios.get(`${API_BASE_URL}/stripe/subscription`, {
+    headers: getAuthHeader(),
+  });
+  const data = response.data;
+  return data.subscription ?? data;
+};
+
+export const getPaymentHistory = async (): Promise<PaymentHistoryItem[]> => {
+  const response = await axios.get(`${API_BASE_URL}/stripe/payment-history`, {
+    headers: getAuthHeader(),
+  });
+  const data = response.data;
+  return data.payments ?? data.data ?? data ?? [];
+};
+
 export const createCheckoutSession = async (
   priceId: string,
 ): Promise<CheckoutResponse> => {
