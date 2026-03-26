@@ -18,6 +18,7 @@ interface TranscriptData {
   status: string;
   confidenceScore?: number;
   isEdited?: boolean;
+  piiMaskingEnabled?: boolean;
 }
 
 interface TranscriptionSectionProps {
@@ -143,6 +144,12 @@ export const TranscriptionSection = ({
                   </span>
                 </p>
               )}
+              <p>
+                PII Masking Enabled:{" "}
+                <span className="font-semibold text-primary">
+                  {transcriptData.piiMaskingEnabled ? "Yes" : "No"}
+                </span>
+              </p>
             </div>
             {transcriptData.isEdited && (
               <span className="bg-blue-100 px-3 py-1 rounded-full font-medium text-blue-700 text-xs">

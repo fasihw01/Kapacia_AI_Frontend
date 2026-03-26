@@ -20,7 +20,7 @@ export const SettingPage = () => {
     email: user?.email || "",
     currentPassword: "",
     password: "",
-    confirmPassword: "",
+    newPassword: "",
   });
   const [sessionLanguage, setSessionLanguage] = useState(
     user?.language || "english",
@@ -49,7 +49,7 @@ export const SettingPage = () => {
         email: user.email || "",
         currentPassword: "",
         password: "",
-        confirmPassword: "",
+        newPassword: "",
       });
       setUseMasterPrompt(
         !user?.customSoapPrompt || user?.customSoapPrompt === "",
@@ -120,7 +120,7 @@ export const SettingPage = () => {
 
       // Update password if provided
       if (formData.currentPassword && formData.password) {
-        if (formData.password !== formData.confirmPassword) {
+        if (formData.password !== formData.newPassword) {
           await Swal.fire({
             title: "Error",
             text: "New password and confirm password do not match",
@@ -145,7 +145,7 @@ export const SettingPage = () => {
         const passwordResponse = await updatePassword({
           currentPassword: formData.currentPassword,
           password: formData.password,
-          confirmPassword: formData.confirmPassword,
+          newPassword: formData.newPassword,
         });
 
         if (passwordResponse && passwordResponse.success) {
@@ -177,7 +177,7 @@ export const SettingPage = () => {
           ...formData,
           currentPassword: "",
           password: "",
-          confirmPassword: "",
+          newPassword: "",
         });
 
         setIsEditing(false);
@@ -434,8 +434,8 @@ export const SettingPage = () => {
           />
           <Input
             type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
+            name="newPassword"
+            value={formData.newPassword}
             onChange={handleInputChange}
             disabled={!isEditing}
             className="py-2.5"
