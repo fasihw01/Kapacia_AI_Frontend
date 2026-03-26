@@ -8,6 +8,7 @@ interface RecordingActionsProps {
   onSaveSession: () => void;
   createSessionMutationPending: boolean;
   stopRecordingMutationPending: boolean;
+  basePath?: string;
 }
 
 export const RecordingActions: React.FC<RecordingActionsProps> = ({
@@ -16,6 +17,7 @@ export const RecordingActions: React.FC<RecordingActionsProps> = ({
   onSaveSession,
   createSessionMutationPending,
   stopRecordingMutationPending,
+  basePath = "/practitioner/my-cases",
 }) => {
   const navigate = useNavigate();
 
@@ -23,7 +25,7 @@ export const RecordingActions: React.FC<RecordingActionsProps> = ({
     <div className="flex justify-end gap-3 pb-8">
       <Button
         variant="link"
-        onClick={() => navigate(`/practitioner/my-cases/${caseId}`)}
+        onClick={() => navigate(`${basePath}/${caseId}`)}
         className=""
       >
         Cancel

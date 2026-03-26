@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   generateSoapNote,
+  regenerateSoapNote,
   createSoapNote,
   getSoapNotesBySession,
   getSoapNoteById,
@@ -71,6 +72,42 @@ export const useGenerateSoapNote = () => {
       // Invalidate session detail (to update hasSoapNote flag)
       queryClient.invalidateQueries({
         queryKey: sessionKeys.detail(variables.sessionId),
+      });
+    },
+  });
+};
+
+// Regenerate SOAP note using AI
+export const useRegenerateSoapNote = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (soapId: string) => {
+      return await regenerateSoapNote(soapId);
+    },
+    onSuccess: (response) => {
+      // Invalidate the specific SOAP note
+      if (response.soapNote?._id) {
+        queryClient.invalidateQueries({
+          queryKey: soapKeys.detail(response.soapNote._id),
+        });
+      }
+      // Invalidate list by session
+      if (response.soapNote?.session) {
+        const sessionId =
+          typeof response.soapNote.session === "string"
+            ? response.soapNote.session
+            : response.soapNote.session;
+        queryClient.invalidateQueries({
+          queryKey: soapKeys.bySession(sessionId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: sessionKeys.detail(sessionId),
+        });
+      }
+      // Fallback: invalidate all soap queries
+      queryClient.invalidateQueries({
+        queryKey: ["soap-status"],
       });
     },
   });

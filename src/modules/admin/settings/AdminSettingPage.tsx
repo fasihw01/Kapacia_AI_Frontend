@@ -20,7 +20,7 @@ export const AdminSettingPage = () => {
     email: user?.email || "",
     currentPassword: "",
     password: "",
-    confirmPassword: "",
+    newPassword: "",
   });
 
   const [masterPrompt, setMasterPrompt] = useState(
@@ -36,7 +36,7 @@ export const AdminSettingPage = () => {
         email: user.email || "",
         currentPassword: "",
         password: "",
-        confirmPassword: "",
+        newPassword: "",
       });
       setMasterPrompt(
         user.masterSoapPrompt ||
@@ -131,12 +131,12 @@ export const AdminSettingPage = () => {
       if (
         formData.currentPassword ||
         formData.password ||
-        formData.confirmPassword
+        formData.newPassword
       ) {
         if (
           !formData.currentPassword ||
           !formData.password ||
-          !formData.confirmPassword
+          !formData.newPassword
         ) {
           Swal.fire({
             icon: "error",
@@ -146,7 +146,7 @@ export const AdminSettingPage = () => {
           return;
         }
 
-        if (formData.password !== formData.confirmPassword) {
+        if (formData.password !== formData.newPassword) {
           Swal.fire({
             icon: "error",
             title: "Validation Error",
@@ -167,7 +167,7 @@ export const AdminSettingPage = () => {
         await updatePasswordMutation.mutateAsync({
           currentPassword: formData.currentPassword,
           password: formData.password,
-          confirmPassword: formData.confirmPassword,
+          newPassword: formData.newPassword,
         });
       }
 
@@ -176,7 +176,7 @@ export const AdminSettingPage = () => {
         ...prev,
         currentPassword: "",
         password: "",
-        confirmPassword: "",
+        newPassword: "",
       }));
 
       setIsEditing(false);
@@ -360,8 +360,8 @@ export const AdminSettingPage = () => {
           />
           <Input
             type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
+            name="newPassword"
+            value={formData.newPassword}
             onChange={handleInputChange}
             disabled={!isEditing}
             className="py-2.5"
@@ -371,38 +371,41 @@ export const AdminSettingPage = () => {
       </Card>
 
       {/* Master Summary Prompt */}
-      <Card className="p-6">
-        <div className="flex items-start gap-2 mb-4">
-          <h2 className="font-medium text-secondary text-sm">
-            Master Prompt for Note Summary
-          </h2>
-          <div className="group relative">
-            <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-            <div className="-top-2 left-6 z-10 absolute bg-gray-800 opacity-0 group-hover:opacity-100 shadow-lg px-3 py-2 rounded-md w-64 text-white text-xs transition-opacity">
-              This prompt will be used to generate AI summaries for Summary
-              notes. Individual practitioners can customize their own prompt,
-              otherwise this master prompt will be used as default.
+
+      {user?.role !== "admin" && (
+        <Card className="p-6">
+          <div className="flex items-start gap-2 mb-4">
+            <h2 className="font-medium text-secondary text-sm">
+              Master Prompt for Note Summary
+            </h2>
+            <div className="group relative">
+              <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+              <div className="-top-2 left-6 z-10 absolute bg-gray-800 opacity-0 group-hover:opacity-100 shadow-lg px-3 py-2 rounded-md w-64 text-white text-xs transition-opacity">
+                This prompt will be used to generate AI summaries for Summary
+                notes. Individual practitioners can customize their own prompt,
+                otherwise this master prompt will be used as default.
+              </div>
             </div>
           </div>
-        </div>
-        <p className="mb-4 text-accent text-sm">
-          Set the default AI prompt for generating Summary note summaries. This
-          will be applied to all practitioners unless they customize their own
-          prompt.
-        </p>
-        <textarea
-          value={masterPrompt}
-          onChange={(e) => setMasterPrompt(e.target.value)}
-          disabled={!isEditing}
-          placeholder="Enter the master prompt for Summary summary generation..."
-          rows={4}
-          className="disabled:opacity-50 px-3 py-2 border border-input rounded-md focus:ring-2 focus:ring-primary w-full text-sm resize-none disabled:cursor-not-allowed"
-        />
-        <p className="mt-2 text-gray-500 text-xs">
-          Recommended: Include instructions for concise summaries focusing on
-          key client concerns and recommended actions.
-        </p>
-      </Card>
+          <p className="mb-4 text-accent text-sm">
+            Set the default AI prompt for generating Summary note summaries.
+            This will be applied to all practitioners unless they customize
+            their own prompt.
+          </p>
+          <textarea
+            value={masterPrompt}
+            onChange={(e) => setMasterPrompt(e.target.value)}
+            disabled={!isEditing}
+            placeholder="Enter the master prompt for Summary summary generation..."
+            rows={4}
+            className="disabled:opacity-50 px-3 py-2 border border-input rounded-md focus:ring-2 focus:ring-primary w-full text-sm resize-none disabled:cursor-not-allowed"
+          />
+          <p className="mt-2 text-gray-500 text-xs">
+            Recommended: Include instructions for concise summaries focusing on
+            key client concerns and recommended actions.
+          </p>
+        </Card>
+      )}
     </div>
   );
 };

@@ -227,24 +227,27 @@ export const RecordSessionPage = () => {
   };
 
   const startTimer = () => {
+    // Record the wall-clock time this timer segment started,
+    // accounting for any seconds already elapsed (e.g. after resume).
+    const segmentStartTime = Date.now() - elapsedSecondsRef.current * 1000;
+
     timerRef.current = window.setInterval(() => {
-      if (!isPausedRef.current) {
-        elapsedSecondsRef.current++;
-      }
-      const h = String(Math.floor(elapsedSecondsRef.current / 3600)).padStart(
-        2,
-        "0",
-      );
-      const m = String(
-        Math.floor((elapsedSecondsRef.current % 3600) / 60),
-      ).padStart(2, "0");
-      const s = String(elapsedSecondsRef.current % 60).padStart(2, "0");
+      if (isPausedRef.current) return;
+
+      // Derive elapsed from real wall-clock time — no drift
+      const totalMs = Date.now() - segmentStartTime;
+      const totalSecs = Math.floor(totalMs / 1000);
+      elapsedSecondsRef.current = totalSecs;
+
+      const h = String(Math.floor(totalSecs / 3600)).padStart(2, "0");
+      const m = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, "0");
+      const s = String(totalSecs % 60).padStart(2, "0");
       setRecordingTime(`${h}:${m}:${s}`);
 
-      if (elapsedSecondsRef.current >= RECORDING_TIME_LIMIT) {
+      if (totalSecs >= RECORDING_TIME_LIMIT) {
         handleStopRecording();
       }
-    }, 1000);
+    }, 500); // poll every 500ms so display updates feel snappy
   };
 
   const stopTimer = () => {

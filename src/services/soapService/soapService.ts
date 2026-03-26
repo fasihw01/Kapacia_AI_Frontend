@@ -143,6 +143,16 @@ export const approveSoapNote = async (
 };
 
 /**
+ * Regenerate a SOAP note using AI
+ */
+export const regenerateSoapNote = async (
+  id: string,
+): Promise<{ success: boolean; message: string; soapNote: SoapNote }> => {
+  const response = await GetApiData(`/soap/${id}/regenerate`, "POST", null, true);
+  return response.data;
+};
+
+/**
  * Delete a SOAP note
  */
 export const deleteSoapNote = async (

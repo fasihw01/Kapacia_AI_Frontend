@@ -137,7 +137,11 @@ export const useUpdatePassword = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { currentPassword?: string; password: string; confirmPassword: string }) => {
+    mutationFn: async (data: {
+      currentPassword?: string;
+      password: string;
+      newPassword: string;
+    }) => {
       const response = await updatePassword(data);
       return response.data;
     },

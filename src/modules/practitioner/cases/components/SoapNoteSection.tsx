@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Loader2 } from "lucide-react";
+import { Edit, Loader2, RefreshCw } from "lucide-react";
+import { regenerateSoapNote } from "@/services/soapService/soapService";
+import { toast } from "react-toastify";
 
 interface SoapNoteData {
   subjective: string;
@@ -32,6 +35,7 @@ interface SoapNoteSectionProps {
   isLoading: boolean;
   hasError: boolean;
   onEditClick: () => void;
+  onRegenerate?: () => void;
 }
 
 export const SoapNoteSection = ({
@@ -40,7 +44,25 @@ export const SoapNoteSection = ({
   isLoading,
   hasError,
   onEditClick,
+  onRegenerate,
 }: SoapNoteSectionProps) => {
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const handleRegenerate = async () => {
+    if (!latestSoapNote?._id) return;
+    setIsRegenerating(true);
+    try {
+      await regenerateSoapNote(latestSoapNote._id);
+      toast.success("Summary regenerated successfully");
+      onRegenerate?.();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to regenerate summary",
+      );
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
   return (
     <Card className="p-6">
       <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3 mb-4">
@@ -73,6 +95,22 @@ export const SoapNoteSection = ({
           </p>
         </div>
         <div className="flex gap-2">
+          {latestSoapNote && (
+            <Button
+              onClick={handleRegenerate}
+              variant="link"
+              disabled={isRegenerating}
+              className="flex items-center gap-2 text-secondary"
+            >
+              {/* {isRegenerating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4" />
+              )}
+              {isRegenerating ? "Regenerating..." : "Regenerate Summary"} */}
+              Regenerate summary
+            </Button>
+          )}
           <Button
             onClick={onEditClick}
             variant="link"
