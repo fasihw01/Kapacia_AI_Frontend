@@ -157,8 +157,8 @@ export const CreateUserModal = ({
               }}
               className="px-3 py-2 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 w-full"
             >
-              {isAdmin && <option value="admin">Admin</option>}
-              {isAdmin && <option value="moderator">Moderator</option>}
+              {isAdmin && <option value="admin">admin</option>}
+              {/* {isAdmin && <option value="moderator">Moderator</option>} */}
             </select>
           </div>
 

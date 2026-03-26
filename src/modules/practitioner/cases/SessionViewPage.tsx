@@ -15,7 +15,7 @@ import {
   useTranscriptBySession,
   useRegenerateTranscript,
 } from "@/hooks/useTranscript";
-import { useSoapNotesBySession, useApproveSoapNote } from "@/hooks/useSoap";
+import { useSoapNotesBySession, useApproveSoapNote, useRegenerateSoapNote } from "@/hooks/useSoap";
 import { Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { SessionHeader } from "./components/SessionHeader";
@@ -72,6 +72,7 @@ export const SessionViewPage = () => {
 
   // Mutations
   const approveSoapNoteMutation = useApproveSoapNote();
+  const regenerateSoapNoteMutation = useRegenerateSoapNote();
 
   const sessionData = sessionResponse?.session || null;
   const transcriptData = transcriptResponse?.data?.transcript || null;
@@ -186,19 +187,51 @@ export const SessionViewPage = () => {
   };
 
   const handleDownload = () => {
-    const resolvedAudioUrl = stableAudioUrl || sessionData?.audioUrl;
-    if (!resolvedAudioUrl) {
-      console.warn("[Download] No audio URL available");
+    // Downloads summary + transcription as .txt files for practitioner review.
+    const sessionNumber =
+      sessionData?.sessionNumber?.toString() || "recording";
+    const baseName = `session-${sessionId}-${sessionNumber}`;
+
+    const downloadText = (filename: string, content: string) => {
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    };
+
+    const summaryText = soapNoteData.summary?.toString() || "";
+    const transcriptRecord = transcriptData as Record<string, unknown> | null;
+    const transcriptText =
+      transcriptRecord && typeof transcriptRecord.rawText === "string"
+        ? transcriptRecord.rawText
+        : "";
+
+    if (!summaryText && !transcriptText) {
+      Swal.fire({
+        title: "Nothing to download",
+        text: "Summary and transcript are not available yet.",
+        icon: "warning",
+        confirmButtonColor: "#188aec",
+      });
       return;
     }
 
-    const a = document.createElement("a");
-    a.href = resolvedAudioUrl;
-    a.download = `session-${sessionId}-${sessionData?.sessionNumber || "recording"}.webm`;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    downloadText(
+      `${baseName}-summary.txt`,
+      `Summary\n\n${summaryText || "Summary not available yet."}`,
+    );
+
+    setTimeout(() => {
+      downloadText(
+        `${baseName}-transcription.txt`,
+        `Transcription\n\n${transcriptText || "Transcript not available yet."}`,
+      );
+    }, 150);
   };
 
   // Stable reference for audio URL to prevent infinite re-renders
@@ -506,6 +539,12 @@ export const SessionViewPage = () => {
         onEditClick={() =>
           navigate(`/practitioner/my-cases/${caseId}/session/${sessionId}/edit`)
         }
+        onRegenerate={() => {
+          if (latestSoapNote?._id) {
+            regenerateSoapNoteMutation.mutate(latestSoapNote._id);
+          }
+        }}
+        isRegenerating={regenerateSoapNoteMutation.isPending}
       />
 
       {/* Approval Section */}

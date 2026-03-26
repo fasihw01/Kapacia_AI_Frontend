@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/Pagination";
-import { Search, ChevronDown, ChevronRight, Plus, Loader2 } from "lucide-react";
+import { Search, ChevronDown, ChevronRight, Plus, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreateCaseModal } from "./CreateCaseModal";
-import { useAllCases } from "@/hooks/useCases";
+import { useAllCases, useDeleteCase } from "@/hooks/useCases";
 import { useAllUsers } from "@/hooks/useUsers";
 import { useDebounce } from "@/hooks/useDebounce";
+import Swal from "sweetalert2";
 
 export const AdminCasesPage = () => {
   const navigate = useNavigate();
@@ -37,6 +38,42 @@ export const AdminCasesPage = () => {
 
   const handleCreateCaseSuccess = () => {
     setIsCreateCaseModalOpen(false);
+  };
+
+  const deleteCaseMutation = useDeleteCase();
+
+  const handleDeleteCase = async (e: React.MouseEvent, caseId: string, caseName: string) => {
+    e.stopPropagation();
+
+    const result = await Swal.fire({
+      title: "Delete Case?",
+      text: `Are you sure you want to delete "${caseName}"? This action cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteCaseMutation.mutateAsync(caseId);
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "The case has been deleted successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (err: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err?.message || "Failed to delete the case. Please try again.",
+        });
+      }
+    }
   };
 
   // Extract cases from API response
@@ -241,8 +278,15 @@ export const AdminCasesPage = () => {
                       </div>
                     </div>
 
-                    {/* Right Side - Arrow */}
-                    <div className="self-start sm:self-center sm:shrink-0">
+                    {/* Right Side - Delete & Arrow */}
+                    <div className="flex items-center gap-2 self-start sm:self-center sm:shrink-0">
+                      <button
+                        onClick={(e) => handleDeleteCase(e, caseItem._id, caseItem.displayName)}
+                        className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        title="Delete case"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                       <ChevronRight className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>

@@ -146,8 +146,9 @@ export const useTranscription = () => {
 };
 
 // Helper function to format timestamp
+// timestamp is in seconds (e.g. 2 = 2s into the recording)
 function formatTimestamp(timestamp: number): string {
-  const totalSeconds = Math.floor(timestamp / 1000);
+  const totalSeconds = Math.floor(timestamp);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;

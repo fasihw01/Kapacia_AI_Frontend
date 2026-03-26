@@ -46,14 +46,7 @@ export const CreateCaseModal = ({
   const [assignedPractitioner, setAssignedPractitioner] = useState("");
   const [status, setStatus] = useState("Active");
   const [tags, setTags] = useState<string[]>([]);
-  const [availableTags] = useState([
-    "anxiety",
-    "english",
-    "cbt",
-    "depression",
-    "trauma",
-    "ocd",
-  ]);
+  const [availableTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
 
   // Use the create case mutation
@@ -307,7 +300,7 @@ export const CreateCaseModal = ({
             <h3 className="mb-3 text-primary text-sm">TAGS</h3>
             <div className="space-y-3">
               {/* Dropdown for predefined tags */}
-              <div className="relative">
+              {/* <div className="relative">
                 <select
                   onChange={(e) => {
                     const selectedTag = e.target.value;
@@ -329,7 +322,7 @@ export const CreateCaseModal = ({
                     ))}
                 </select>
                 <ChevronDown className="top-1/2 right-3 absolute w-4 h-4 text-gray-400 -translate-y-1/2 pointer-events-none" />
-              </div>
+              </div> */}
 
               {/* Input for custom tags */}
               <div className="flex gap-2">
