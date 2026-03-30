@@ -1,14 +1,17 @@
-import { GetApiData } from "../utils/http-client";
+import axios from "axios";
+import { AuthHeader } from "../utils/auth.utils";
+import { Config } from "../../config";
 
 /**
- * Backup all system data
+ * Backup all system data — returns the raw zip blob from the server.
  */
 export const backupAllData = async (): Promise<Blob> => {
-  const url = "/backup";
-  const response = await GetApiData(url, "GET");
-  
-  // Convert the parsed JSON object back to a formatted string
-  const jsonString = JSON.stringify(response.data, null, 2);
-  
-  return new Blob([jsonString], { type: "application/json" });
+  const response = await axios({
+    url: `${Config.API_BASE_URL}/backup`,
+    method: "GET",
+    headers: AuthHeader(),
+    responseType: "blob",
+  });
+
+  return response.data;
 };
