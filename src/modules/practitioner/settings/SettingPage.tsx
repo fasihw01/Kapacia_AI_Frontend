@@ -36,7 +36,7 @@ export const SettingPage = () => {
 
   // Get admin's master prompt from user context (supervisor)
   const masterPrompt =
-    user?.supervisor?.masterSoapPrompt ||
+    (typeof user?.supervisor === "object" && user?.supervisor?.masterSoapPrompt) ||
     "Please provide a concise summary of the client's overall condition, key concerns, and recommended actions based on the Summary note above.";
 
   // Update local state when user data changes
@@ -113,7 +113,12 @@ export const SettingPage = () => {
           const updatedUserData =
             profileResponse.data.user || profileResponse.data.userData;
           if (updatedUserData) {
-            setUser(updatedUserData);
+            // Preserve the populated supervisor object from current user context
+            // since the profile update response may only return the supervisor ID
+            setUser({
+              ...updatedUserData,
+              supervisor: updatedUserData.supervisor ?? user?.supervisor,
+            });
           }
         }
       }

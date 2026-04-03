@@ -11,7 +11,7 @@ export interface UserData {
   language: string;
   piiMasking: boolean;
   customSoapPrompt: string;
-  supervisor?: string | null;
+  supervisor?: { _id: string; masterSoapPrompt?: string | null } | string | null;
   masterSoapPrompt?: string | null;
 }
 
