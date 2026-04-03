@@ -70,7 +70,7 @@ export const AdminSettingPage = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `kapacia-backup-${new Date().toISOString().split("T")[0]}.json`;
+      link.download = `kapacia-backup-${new Date().toISOString().split("T")[0]}.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
